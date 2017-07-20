@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.haven.interfaces.UserInterface">
+
+  <resultMap type="com.haven.model.User" id="UserResult">
+  	<id column="userId" jdbcType="INTEGER" property="userId"/>
+  	<result column="userName" jdbcType="VARCHAR" property="userName"/>
+  	<result column="password" jdbcType="VARCHAR" property="password"/>
+  	<result column="userType" jdbcType="VARCHAR" property="userType"/>
+  	<collection property="addrList" resultMap="com.haven.interfaces.AddressInterface.AddressResult"/>
+  </resultMap>
+
+  <!-- 用户注册 -->
+  <insert id="register" parameterType="com.haven.model.User" useGeneratedKeys="true" keyProperty="userId">
+    insert into tb_User
+    values(null, #{userName}, #{password}, #{userType})
+  </insert>
+  
+  <!-- 删除单个用户 -->
+  <delete id="deleteOne" parameterType="int">
+    delete from tb_User where userId = #{_parameter}
+  </delete>
+  <!-- 批量删除用户 -->
+  <delete id="deleteBatch" parameterType="java.util.List">
+    delete from tb_User where userId in
+    <foreach collection="list" item="userId" open="(" separator="," close=")">
+      #{userId}
+    </foreach>
+  </delete>
+  
+  <!-- 修改用户 -->
+  <update id="update" parameterType="com.haven.model.User">
+    update tb_User
+    <set>
+      <if test="userName != null and !&quot;&quot;.equals(userName.trim())">
+        userName = #{userName},
+      </if>
+      <if test="password != null and !&quot;&quot;.equals(password.trim())">
+        password = #{password},
+      </if>
+      <if test="userType != null and !&quot;&quot;.equals(userType.trim())">
+        userType = #{userType}
+      </if>
+    </set>
+    where userId = #{userId}
+  </update>
+  
+  <!-- 查询用户 -->
+  <select id="getUserInfo" parameterType="com.haven.model.User" resultMap="UserResult">
+    select userId, userName, password, userType from tb_User
+    <where>
+      <if test="userName != null and !&quot;&quot;.equals(userName.trim())">
+        userName = #{userName}
+      </if>
+      <if test="password != null and !&quot;&quot;.equals(password.trim())">
+        and password = #{password}
+      </if>
+    </where>
+  </select>
+  
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.haven.interfaces.AddressInterface">
+	<resultMap type="com.haven.model.Address" id="AddressResult">
+		<id column="addrId" jdbcType="INTEGER" property="addrId"/>
+		<result column="addrProvince" jdbcType="VARCHAR" property="addrProvince"/>
+		<result column="addrDetail" jdbcType="VARCHAR" property="addrDetail"/>
+		<result column="addrPhone" jdbcType="VARCHAR" property="addrPhone"/>
+		<result column="addrConsinee" jdbcType="VARCHAR" property="addrConsinee"/>
+		<result column="userId" jdbcType="INTEGER" property="userId"/>
+	</resultMap>
+	
+<!-- 地址表列名 -->
+	<sql id="allColumns">addrId, addrProvince, addrDetail, addrPhone, addrConsinee, userId</sql>
+
+<!-- 插入一条地址记录 -->
+	<insert id="insert" parameterType="com.haven.model.Address" useGeneratedKeys="true" keyProperty="addrId">
+	  insert into tb_Address (<include refid="allColumns"/>)
+	  values(null, #{addrProvince}, #{addrDetail}, #{addrPhone}, #{addrConsinee}, #{userId})
+	</insert>
+		
+<!-- 删除一条地址记录 -->
+	<delete id="deleteOne" parameterType="int">
+	  delete from tb_Address where addrId = #{_parameter}
+	</delete>	
+<!-- 批量删除 -->
+	<delete id="deleteBatch" parameterType="int[]">
+	  delete from tb_Address where addrId in
+	  <foreach collection="array" item="addrId" open="(" separator="," close=")">
+	    #{addrId}
+	  </foreach>
+	</delete>
+	
+<!-- 修改地址信息 -->
+	<update id="update" parameterType="com.haven.model.Address">
+	  update tb_Address
+	  <set>
+	    <if test="addrProvince != null and !&quot;&quot;.equals(addrProvince.trim())">
+	      addrProvince = #{addrProvince},
+	    </if>
+	    <if test="addrDetail != null and !&quot;&quot;.equals(addrDetail.trim())">
+	      addrDetail = #{addrDetail},
+	    </if>
+	    <if test="addrPhone != null and !&quot;&quot;.equals(addrPhone.trim())">
+	      addrPhone = #{addrPhone},
+	    </if>
+	    <if test="addrConsinee != null and !&quot;&quot;.equals(addrConsinee.trim())">
+	      addrConsinee = #{addrConsinee},
+	    </if>
+	  </set>
+	  where addrId = #{addrId}
+	</update>
+		
+<!-- 获取地址信息 -->
+	<select id="getAddrInfo" parameterType="int" resultMap="AddressResult">
+	  select <include refid="allColumns"/> from tb_Address
+	  where userId = #{_parameter}
+	</select>
+	
+</mapper>
