@@ -22,7 +22,7 @@ public class Order {
 
 	public Order(String storeName, String orderDate, double orderPrice, String userName, String orderState,
 			int addrId, Address orderAddr, List<OrderProduct> productList) {
-		super();
+//		super();
 		this.storeName = storeName;
 		this.orderDate = orderDate;
 		this.orderPrice = orderPrice;
@@ -31,6 +31,17 @@ public class Order {
 		this.addrId = addrId;
 		this.orderAddr = orderAddr;
 		this.productList = productList;
+	}
+
+	public Order(String storeName, String orderDate, double orderPrice, String userName, String orderState,
+			int addrId) {
+//		super();
+		this.storeName = storeName;
+		this.orderDate = orderDate;
+		this.orderPrice = orderPrice;
+		this.userName = userName;
+		this.orderState = orderState;
+		this.addrId = addrId;
 	}
 
 	public int getOrderId() {

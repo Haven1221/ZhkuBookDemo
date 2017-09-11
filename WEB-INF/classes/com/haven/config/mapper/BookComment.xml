@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haven.dao.BookCommentDAO">
+
+	<resultMap type="com.haven.model.BookComment" id="BookCommentResult">
+		<id column="commentId" jdbcType="INTEGER" property="commentId" />
+		<result column="bookId" jdbcType="INTEGER" property="bookId" />
+		<result column="orderId" jdbcType="INTEGER" property="orderId" />
+		<result column="userName" jdbcType="VARCHAR" property="userName" />
+		<result column="commentScore" jdbcType="INTEGER" property="commentScore" />
+		<result column="commentContent" jdbcType="VARCHAR" property="commentContent" />
+	</resultMap>
+	
+<!-- 插入一条评论 -->
+	<insert id="insert" parameterType="com.haven.model.BookComment" useGeneratedKeys="true" keyProperty="commentId">
+		insert into tb_BookComment (commentId, bookId, orderId, userName, commentScore, commentContent) 
+		values(null, #{bookId}, #{orderId}, #{userName}, #{commentScore}, #{commentContent})
+	</insert>
+	
+<!-- 删除一条评论 -->
+	<delete id="deleteOne" parameterType="int">
+		delete from tb_BookComment 
+		where commentId = #{_parameter}
+	</delete>
+<!-- 批量删除评论 -->
+	<delete id="deleteBatch" parameterType="int[]">
+		delete from tb_BookComment
+		where commentId in
+		<foreach collection="array" item="commentId" open="(" separator="," close=")">
+			#{commentId}
+		</foreach>
+	</delete>
+	
+<!-- 获取图书评论 -->
+	<select id="getComment" parameterType="com.haven.model.BookComment" resultMap="BookCommentResult">
+		select commentId, bookId, orderId, userName, commentScore, commentContent from tb_BookComment
+		<where>
+		  <if test="userName != null and !&quot;&quot;.equals(userName.trim())">
+		    userName = #{userName}
+		  </if>
+		  <if test="bookId > 0">
+		    and bookId = #{bookId}
+		  </if>
+		</where>
+	</select>
+
+</mapper>

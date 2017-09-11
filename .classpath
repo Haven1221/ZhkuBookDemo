@@ -18,5 +18,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/mysql-JDBC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/log4j-lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/c3p0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/spring-mybatis"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/common-logging-1.1.1"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/spring-core"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haven.dao.CartDAO">
+	
+	<resultMap type="com.haven.model.Cart" id="CartResult">
+		<id column="cartId" jdbcType="INTEGER" property="cartId"/>
+		<result column="bookId" jdbcType="INTEGER" property="bookId"/>
+		<result column="userName" jdbcType="VARCHAR" property="userName"/>
+		<result column="storeName" jdbcType="VARCHAR" property="storeName"/>
+		<result column="bookName" jdbcType="VARCHAR" property="bookName"/>
+		<result column="bookPrice" jdbcType="DOUBLE" property="bookPrice"/>
+		<result column="bookCount" jdbcType="INTEGER" property="bookCount"/>
+		<result column="bookImage" jdbcType="VARCHAR" property="bookImage"/>
+	</resultMap>
+	
+<!-- 全部列名 -->
+	<sql id="allColumns">cartId, bookId, userName, storeName, bookName, bookPrice, bookCount, bookImage</sql>
+	
+<!-- 往购物车表中插入一条记录 -->
+	<insert id="insert" parameterType="com.haven.model.Cart" useGeneratedKeys="true" keyProperty="cartId">
+	  insert into tb_Cart (<include refid="allColumns"/>)
+	  values(null, #{bookId}, #{userName}, #{storeName}, #{bookName}, #{bookPrice}, #{bookCount}, #{bookImage})
+	</insert>
+	
+<!-- 删除一条记录 -->
+	<delete id="deleteOne" parameterType="int">
+	  delete from tb_Cart where cartId = #{_parameter}
+	</delete>
+<!-- 批量删除 -->
+	<delete id="deleteBatch" parameterType="int[]">
+	  delete from tb_Cart where cartId in
+	  <foreach collection="array" item="cartId" open="(" separator="," close=")">
+	    #{cartId}
+	  </foreach>
+	</delete>
+	
+<!-- 修改图书购买数量 -->
+	<update id="update" parameterType="com.haven.model.Cart">
+	  update tb_Cart set bookCount = #{bookCount} where cartId = #{cartId}
+	</update>
+	
+<!-- 查询购物车记录 -->
+	<select id="getCart" parameterType="com.haven.model.Cart" resultMap="CartResult">
+	  select <include refid="allColumns"/> from tb_Cart
+	  <where>
+	    <if test="userName != null and !&quot;&quot;.equals(userName.trim())">
+	      userName = #{userName}
+	    </if>
+	    <if test="bookId > 0">
+	      and bookId = #{bookId}
+	    </if>
+	    <if test="storeName != null and !&quot;&quot;.equals(storeName.trim())">
+	      and storeName = #{storeName}
+	    </if>
+	    <if test="bookName != null and !&quot;&quot;.equals(bookName.trim())">
+	      and bookName = #{bookName}
+	    </if>
+	  </where>
+	</select>
+<!-- 根据用户名获取店铺列表 -->
+	<select id="getStoreName" parameterType="String" resultMap="CartResult">
+	  select storeName from tb_Cart where userName = #{_parameter} group by storeName
+	</select>
+<!-- 根据购物车编号获取购物车信息列表 -->
+	<select id="getCartById" parameterType="int[]" resultMap="CartResult">
+	  select <include refid="allColumns"/> from tb_Cart where cartId in 
+	  <foreach collection="array" item="cartId" open="(" separator="," close=")">
+	    #{cartId}
+	  </foreach>
+	</select>
+	
+</mapper>

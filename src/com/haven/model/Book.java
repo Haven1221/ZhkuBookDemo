@@ -1,7 +1,5 @@
 package com.haven.model;
 
-import java.util.List;
-
 /**
  * 图书实体类，对应数据库中的图书表
  */
@@ -21,14 +19,13 @@ public class Book {
 	private int bookPage; // 图书总页数
 	private String bookDescript; // 图书简介
 	private String bookImage; // 图书封面
-	private List<BookComment> commentList; // 图书评论
 	
 	public Book() {
 	}
 
 	public Book(int storeId, String storeName, String bookISBN, String bookName, String bookAuthor, String bookPublisher,
 			double bookPrice, int bookSaleNum, int bookSumNum, String bookClass, int bookPage, String bookDescript,
-			String bookImage, List<BookComment> commentList) {
+			String bookImage) {
 //		super();
 		this.storeId = storeId;
 		this.storeName = storeName;
@@ -43,7 +40,6 @@ public class Book {
 		this.bookPage = bookPage;
 		this.bookDescript = bookDescript;
 		this.bookImage = bookImage;
-		this.commentList = commentList;
 	}
 
 
@@ -157,14 +153,6 @@ public class Book {
 
 	public void setBookImage(String bookImage) {
 		this.bookImage = bookImage;
-	}
-	
-	public List<BookComment> getCommentList() {
-		return commentList;
-	}
-
-	public void setCommentList(List<BookComment> commentList) {
-		this.commentList = commentList;
 	}
 	
 }

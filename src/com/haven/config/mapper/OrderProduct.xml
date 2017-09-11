@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haven.dao.OrderProductDAO">
+	
+	<resultMap type="com.haven.model.OrderProduct" id="OrderProductResult">
+		<id column="productId" jdbcType="INTEGER" property="productId"/>
+		<result column="orderId" jdbcType="INTEGER" property="orderId"/>
+		<result column="bookId" jdbcType="INTEGER" property="bookId"/>
+		<result column="productName" jdbcType="VARCHAR" property="productName"/>
+		<result column="productPrice" jdbcType="DOUBLE" property="productPrice"/>
+		<result column="productCount" jdbcType="INTEGER" property="productCount"/>
+		<result column="productImage" jdbcType="VARCHAR" property="productImage"/>
+	</resultMap>
+	
+<!-- 所有列名 -->
+	<sql id="allColumns">productId, orderId, bookId, productName, productPrice, productCount, productImage</sql>
+	
+<!-- 批量插入 -->
+	<insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="productId">
+	  insert into tb_OrderProduct (<include refid="allColumns"/>) values
+	  <foreach collection="list" item="pro" separator=",">
+	    (null, #{pro.orderId}, #{pro.bookId}, #{pro.productName}, #{pro.productPrice}, #{pro.productCount}, #{pro.productImage})
+	  </foreach>
+	</insert>
+	
+<!-- 删除一条记录 -->
+	<delete id="deleteOne" parameterType="int">
+	  delete from tb_OrderProduct where orderId = #{_parameter}
+	</delete>
+<!-- 批量删除 -->
+	<delete id="deleteBatch" parameterType="int[]">
+	  delete from tb_OrderProduct where orderId in 
+	  <foreach collection="array" item="orderId" open="(" separator="," close=")">
+	    #{orderId}
+	  </foreach>
+	</delete>
+	
+<!-- 根据订单号查询 -->
+	<select id="getOrderProduct" parameterType="int" resultMap="OrderProductResult">
+	  select <include refid="allColumns"/> from tb_OrderProduct
+	    where orderId = #{_parameter}
+	</select>		
+	
+</mapper>

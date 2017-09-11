@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haven.dao.BookDAO">
+	
+	<resultMap type="com.haven.model.Book" id="BookResult">
+		<id column="bookId" jdbcType="INTEGER" property="bookId"/>
+		<result column="storeId" jdbcType="INTEGER" property="storeId"/>
+		<result column="storeName" jdbcType="VARCHAR" property="storeName"/>
+		<result column="bookISBN" jdbcType="VARCHAR" property="bookISBN"/>
+		<result column="bookName" jdbcType="VARCHAR" property="bookName"/>
+		<result column="bookAuthor" jdbcType="VARCHAR" property="bookAuthor"/>
+		<result column="bookPublisher" jdbcType="VARCHAR" property="bookPublisher"/>
+		<result column="bookPrice" jdbcType="DOUBLE" property="bookPrice"/>
+		<result column="bookSaleNum" jdbcType="INTEGER" property="bookSaleNum"/>
+		<result column="bookSumNum" jdbcType="INTEGER" property="bookSumNum"/>
+		<result column="bookClass" jdbcType="VARCHAR" property="bookClass"/>
+		<result column="bookPage" jdbcType="INTEGER" property="bookPage"/>
+		<result column="bookDescript" jdbcType="VARCHAR" property="bookDescript"/>
+		<result column="bookImage" jdbcType="VARCHAR" property="bookImage"/>
+	</resultMap>
+	
+<!-- 所有列名 -->
+	<sql id="allColumns">b.bookId, b.storeId, storeName, bookISBN, bookName, bookAuthor, bookPublisher, bookPrice, 
+		bookSaleNum, bookSumNum, bookClass, bookPage, bookDescript, bookImage
+	</sql>
+<!-- 简要列名 -->
+	<sql id="briefColumns">bookId, storeId, storeName, bookName, bookImage, bookPrice, bookAuthor</sql>
+	
+<!-- 插入一本书 -->
+	<insert id="insertOne" parameterType="com.haven.model.Book" useGeneratedKeys="true" keyProperty="bookId">
+	  insert into tb_Book 
+	  values(null, #{storeId}, #{storeName}, #{bookISBN}, #{bookName}, #{bookAuthor}, #{bookPublisher}, #{bookPrice},
+	  	#{bookSaleNum}, #{bookSumNum}, #{bookClass}, #{bookPage}, #{bookDescript}, #{bookImage})
+	</insert>
+<!-- 批量插入 -->
+	<insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="bookId">
+	  insert into tb_Book values
+	  <foreach collection="list" item="book" separator=",">
+	    (null, #{book.storeId}, #{book.storeName}, #{book.bookISBN}, #{book.bookName}, #{book.bookAuthor}, #{book.bookPublisher}, 
+	    #{book.bookPrice}, #{book.bookSaleNum}, #{book.bookSumNum}, #{book.bookClass}, #{book.bookPage}, 
+	    #{book.bookDescript}, #{book.bookImage})
+	  </foreach>
+	</insert>
+	
+<!-- 删除一本书 -->
+	<delete id="deleteOne" parameterType="int">
+	 delete from tb_Book where bookId = #{_parameter}
+	</delete>
+<!-- 批量删除 -->
+	<delete id="deleteBatch" parameterType="int[]">
+	  delete from tb_Book where bookId in
+	  <foreach collection="array" item="bookId" open="(" separator="," close=")">
+	    #{bookId}
+	  </foreach>
+	</delete>
+	
+<!-- 修改图书信息 -->
+	<update id="update" parameterType="com.haven.model.Book">
+	  update tb_Book 
+	  <set>
+	    <if test="bookISBN != null and !&quot;&quot;.equals(bookISBN.trim())">bookISBN = #{bookISBN},</if>
+	    <if test="bookName != null and !&quot;&quot;.equals(bookName.trim())">bookName = #{bookName},</if>
+	    <if test="bookAuthor != null and !&quot;&quot;.equals(bookAuthor.trim())">bookAuthor = #{bookAuthor},</if>
+	    <if test="bookPublisher != null and !&quot;&quot;.equals(bookPublisher.trim())">bookPublisher = #{bookPublisher},</if>
+	    <if test="bookPrice > 0">bookPrice = #{bookPrice},</if>
+	    <if test="bookSaleNum > 0">bookSaleNum = #{bookSaleNum},</if>
+	    <if test="bookSumNum > 0">bookSumNum = #{bookSumNum},</if>
+		<if test="bookClass != null and !&quot;&quot;.equals(bookClass.trim())">bookClass = #{bookClass},</if>
+	    <if test="bookPage > 0">bookPage = #{bookPage},</if>
+	    <if test="bookDescript != null and !&quot;&quot;.equals(bookDescript.trim())">bookDescript = #{bookDescript},</if>
+	    <if test="bookImage != null and !&quot;&quot;.equals(bookImage.trim())">bookImage = #{bookImage}</if>
+	  </set>
+	  where bookId = #{bookId}
+	</update>
+<!-- 下单时修改图书销售量和库存量 -->
+	<update id="updateFromOrder" parameterType="com.haven.model.Book">
+	  update tb_Book 
+	  set bookSaleNum = bookSaleNum + #{bookSaleNum}, bookSumNum = bookSumNum - #{bookSumNum}
+	  where bookId = #{bookId} 
+	</update>
+	
+<!-- 查询销量最好的4本书 -->
+	<select id="getBookWithHotSale" parameterType="String" resultMap="BookResult">
+	  select <include refid="briefColumns"/> from tb_Book
+	  <where>
+	    <if test="_parameter != null and !&quot;&quot;.equals(_parameter.trim())">
+	      storeName = #{_parameter}
+	    </if>
+	  </where>
+	  order by bookSaleNum desc limit 0,4
+	</select>
+<!-- 查询最新上传的4本书 -->
+	<select id="getBookWithNew" parameterType="String" resultMap="BookResult">
+	  select <include refid="briefColumns"/> from tb_Book
+	  <where>
+	   <if test="_parameter != null and !&quot;&quot;.equals(_parameter.trim())">
+	      storeName = #{_parameter}
+	    </if>
+	  </where>
+	  order by bookId desc limit 0,4
+	</select>
+<!-- 根据图书名称、类别模糊查询图书，分页显示 -->
+	<select id="getBookByPage" parameterType="java.util.Map" resultMap="BookResult">
+	  select <include refid="briefColumns"/> from tb_Book
+	  <where>
+	    <if test="book != null and book.storeName != null and !&quot;&quot;.equals(book.storeName.trim())">
+	      storeName = #{book.storeName, jdbcType=VARCHAR}
+	    </if>
+	    <if test="book != null and book.bookName != null and !&quot;&quot;.equals(book.bookName.trim())">
+	      and bookName like '%' #{book.bookName, jdbcType=VARCHAR} '%'
+	    </if>
+	    <if test="book != null and book.bookClass != null and !&quot;&quot;.equals(book.bookClass.trim())">
+	      and bookClass like '%' #{book.bookClass, jdbcType=VARCHAR} '%'
+	    </if>
+	  </where>
+	  order by bookSaleNum desc
+	</select>
+<!-- 获取图书详细信息 -->
+	<select id="getBookInfo" parameterType="int" resultMap="BookResult">
+	  select <include refid="allColumns"/> from tb_Book b 
+	    where b.bookId = #{_parameter}
+	</select>
+<!-- 插入图书时判断图书是否存在 -->
+	<select id="isExisted" parameterType="com.haven.model.Book" resultMap="BookResult">
+	  select bookId, bookSumNum from tb_Book
+	  <where>
+	    <if test="storeName != null and !&quot;&quot;.equals(storeName.trim())">
+	      storeName = #{storeName}
+	    </if>
+	    <if test="bookName != null and !&quot;&quot;.equals(bookName.trim())">
+	      and bookName = #{bookName}
+	    </if>
+	    <if test="bookAuthor != null and !&quot;&quot;.equals(bookAuthor.trim())">
+	      and bookAuthor = #{bookAuthor}
+	    </if>
+	  </where>
+	</select>
+	
+</mapper>
